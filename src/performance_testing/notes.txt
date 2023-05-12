@@ -1,0 +1,9 @@
+#Using a minimal python environment
+mamba create --name per_test python=3.8
+mamba activate per_test
+mamba install numpy scipy numba pybind11 zarr astropy xarray
+
+#Using a minimal python environment
+mamba create --name per_test_3_11 python=3.11
+mamba activate per_test_3_11
+pip install numpy scipy numba==0.57.0 pybind11 zarr astropy xarray
