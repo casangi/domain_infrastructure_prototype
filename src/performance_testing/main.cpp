@@ -16,7 +16,4 @@ int main()
     return 0;
 }
 
-//gcc -std=c++17 -I /Users/jsteeb/mambaforge-pypy3/envs/zinc/include/ -I /Users/jsteeb/mambaforge-pypy3/envs/zinc/include/xtl/ -I /Users/jsteeb/mambaforge-pypy3/envs/zinc/lib/python3.8/site-packages/numpy/core/include  -undefined dynamic_lookup $(python3 -m pybind11 --includes) -o grid_example  gridder/single_cf_gridder.cpp main.cpp -L/usr/local/lib -lstdc++
-
-
-//gcc -std=c++17 -o grid_example  gridder/single_cf_gridder.cpp main.cpp -L/usr/local/lib -lstdc++
+//gcc -std=c++17 -o bin/grid_example  gridder/single_cf_gridder.cpp main.cpp -L/usr/local/lib -lstdc++

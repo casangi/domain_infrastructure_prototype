@@ -12,7 +12,7 @@ private:
 public:
   single_cf_gridder();
   int sum(int x,int y);
-  void increment_array(double* array);
+  void increment_array(double array[]);
 };
 
 #endif

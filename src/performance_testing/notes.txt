@@ -7,3 +7,29 @@ mamba install numpy scipy numba pybind11 zarr astropy xarray
 mamba create --name per_test_3_11 python=3.11
 mamba activate per_test_3_11
 pip install numpy scipy numba==0.57.0 pybind11 zarr astropy xarray
+
+
+'param==1.13.0',
+'psutil==5.9.4',
+'setuptools==65.6.3',
+'Shapely==2.0.1',
+
+
+mamba install -c conda-forge boosts
+
+
+#Release the GIL
+https://pybind11.readthedocs.io/en/stable/advanced/misc.html#global-interpreter-lock-gil
+
+#Direct Access
+
+
+
+
+Objectives
+
+Used chatGBT and Bard
+Minimal Overhead
+No copies (monitor memory)
+Wrap an object
+Cleanly separate C++ and Python Interface (non-PyBind C++ code can be compiled without PyBind11)

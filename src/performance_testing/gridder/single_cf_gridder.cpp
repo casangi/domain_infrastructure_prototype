@@ -11,7 +11,7 @@ int single_cf_gridder::sum(int x,int y)
     return x + y;
 }
 
-void single_cf_gridder::increment_array(double* array)
+void single_cf_gridder::increment_array(double array[])
 {
     for (size_t i = 0; i < 10; i++) {
         array[i]++;

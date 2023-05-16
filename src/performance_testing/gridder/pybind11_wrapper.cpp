@@ -8,13 +8,48 @@ using namespace std;
 using namespace pybind11::literals;
 #include "single_cf_gridder.h"
 
+class single_cf_gridder_pybind : private single_cf_gridder {
+public:
+  single_cf_gridder_pybind() : single_cf_gridder() {}
+
+  int sum(int x,int y){
+    cout << "Hallo sum " << endl;
+    return single_cf_gridder::sum(x,y);
+  }
+    
+  void increment_array(py::array_t<double>& array_in){
+      //https://pybind11.readthedocs.io/en/stable/advanced/pycpp/numpy.html?highlight=array#direct-access
+      auto mutable_mapping = array_in.mutable_unchecked<1>();
+      auto array = reinterpret_cast<double*>(mutable_mapping.mutable_data(0));
+      
+      //auto array = reinterpret_cast<double*>(mutable_mapping.mutable_data());
+      cout << "2. Hallo increment_array " << array[0] << endl;
+      array[0] = array[0] + 10;
+      single_cf_gridder::increment_array(array);
+    }
+};
+
 
 PYBIND11_MODULE(pybind11_wrapper, m)
 {
-    py::class_<single_cf_gridder>(m, "single_cf_gridder")
+    py::class_<single_cf_gridder_pybind>(m, "single_cf_gridder_pybind")
         .def(py::init<>()) // constructor
-        .def("sum", &single_cf_gridder::sum);
+        .def("sum", &single_cf_gridder_pybind::sum)
+        .def("increment_array", &single_cf_gridder_pybind::increment_array, py::arg().noconvert());
 }
+
+
+
+
+
+
+
+//PYBIND11_MODULE(pybind11_wrapper, m)
+//{
+//    py::class_<single_cf_gridder>(m, "single_cf_gridder")
+//        .def(py::init<>()) // constructor
+//        .def("sum", &single_cf_gridder::sum);
+//}
 
 
 //g++ -o  gridder/single_cf_gridder.cpp gridder/pybind11_wrapper.cpp -lpybind11
