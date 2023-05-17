@@ -5,14 +5,15 @@
 
 class single_cf_gridder
 {
-private:
-  int gx;
-  int gy;
+//private:
+//  int gx;
+//  int gy;
 
 public:
   single_cf_gridder();
   int sum(int x,int y);
   void increment_array(double array[]);
+  void create_array(int array_length=10);
 };
 
 #endif

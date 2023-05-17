@@ -4,20 +4,45 @@ import os
 import linecache
 import numpy as np
 import time
+import psutil
 
 
 def main():
 
     import bin.pybind11_wrapper as py11
-    gridder = py11.single_cf_gridder_pybind()
     
-    tracemalloc.start()
+    #tracemalloc.start()
     start = time.time()
-    array = np.random.rand(100000000)
-    gridder.increment_array(array)
-    snapshot = tracemalloc.take_snapshot()
-    display_top(snapshot)
-    tracemalloc.stop()
+    
+    gridder = py11.single_cf_gridder_pybind()
+    #array = np.random.rand(100000000)
+    #gridder.increment_array(array)
+    gridder.create_array(100000000)
+    
+    # Monitor memory usage
+    #monitor_memory()
+    
+    #snapshot = tracemalloc.take_snapshot()
+    #display_top(snapshot)
+    #tracemalloc.stop()
+    time.sleep(100)
+    
+    
+#in use at exit: 1,299,406 bytes in 963 blocks
+#total heap usage: 15,011 allocs, 14,048 frees, 424,619,686 bytes allocated
+
+#HEAP SUMMARY:
+#  in use at exit: 1,295,310 bytes in 962 blocks
+#  total heap usage: 15,006 allocs, 14,044 frees, 24,607,604 bytes allocated
+
+
+    
+# Function to monitor memory usage
+def monitor_memory():
+    process = psutil.Process()
+    print(f"Memory Usage: {process.memory_info().rss} bytes")
+
+    
 
 def display_top(snapshot, key_type='lineno', limit=3):
     snapshot = snapshot.filter_traces((
@@ -50,6 +75,8 @@ if __name__=="__main__":
     
     
     
+#valgrind --leak-check=full --show-leak-kinds=all --without-pymalloc python main_pybind11.py
+#valgrind python main_pybind11.py
 
 
 '''
