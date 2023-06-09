@@ -31,7 +31,7 @@ brew tap louisbrunner/valgrind
 brew install --HEAD LouisBrunner/valgrind/valgrind
 brew upgrade --fetch-HEAD LouisBrunner/valgrind/valgrind
 
-
+htop -p $(pgrep -f "python main_pybind11.py") -d 1 -u --sort-key PERCENT_MEM --no-color > monitoring.txt
 
 Objectives
 
@@ -40,3 +40,13 @@ Minimal Overhead
 No copies (monitor memory)
 Wrap an object
 Cleanly separate C++ and Python Interface (non-PyBind C++ code can be compiled without PyBind11)
+
+
+54698400
+       600,
+        22791,
+        2,
+        2
+
+
+
