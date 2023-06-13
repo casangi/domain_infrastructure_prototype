@@ -10,59 +10,20 @@ using namespace std;
 
 single_cf_gridder::single_cf_gridder()
 {
+    use_internal_grid = false;
+    grid_set = false;
+}
+
+void single_cf_gridder::create_grid(long n_imag_chan,long n_imag_pol,long image_size)
+{
+    int grid_size = n_imag_chan*n_imag_pol*image_size*image_size;
+    internal_grid.resize(grid_size,std::complex<double>(0.0, 0.0));
+    grid_set = true;
+}
+
+void single_cf_gridder::add_to_grid(long* grid_shape, double* sum_weight, std::complex<double>* vis_data, long* vis_shape, double* uvw, double* freq_chan, long* chan_map, long* pol_map, double* weight, double* cgk_1D, double* delta_lm, int support, int oversampling) {
     
-}
-
-int single_cf_gridder::sum(int x,int y)
-{
-    return x + y;
-}
-
-void single_cf_gridder::increment_array(double array[])
-{
-    for (size_t i = 0; i < 10; i++) {
-        array[i]++;
-    }
-}
-
-
-void single_cf_gridder::create_array(int array_length)
-{
-    // Seed the random number generator
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
-
-    // Create a random number generator
-    std::default_random_engine generator(std::rand());
-
-    // Create a distribution for generating random float numbers
-    double minVal = 0.0f;
-    double maxVal = 1.0f;
-    std::uniform_real_distribution<double> distribution(minVal, maxVal);
-
-    // Create a vector to hold the random float numbers
-    std::vector<double> floatArray(array_length);
-
-    // Populate the vector with random float numbers
-    for (int i = 0; i < array_length; ++i) {
-        floatArray[i] = distribution(generator);
-    }
-    
-    std::cout << "Element 101 is " << floatArray[101] << std::endl;
-    std::cout << "I am sleeping " << std::endl;
-    std::chrono::seconds duration(10);
-    std::this_thread::sleep_for(duration);
-    std::cout << "Done sleeping " << std::endl;
-}
-
-
-void single_cf_gridder::grid_vis_data(std::complex<double>**** grid)
-{
-    std::complex<double> mycomplex(10.0, 2.0);
-    grid[1][2][1][0] = mycomplex;
-}
-
-
-void single_cf_gridder::add_to_grid(std::complex<double>* grid, long* grid_shape, double* sum_weight, std::complex<double>* vis_data, long* vis_shape, double* uvw, double* freq_chan, long* chan_map, long* pol_map, double* weight, double* cgk_1D, double* delta_lm, int support, int oversampling) {
+    std::complex<double>* grid = internal_grid.data();
 
     int n_time = vis_shape[0];
     int n_baseline = vis_shape[1];
@@ -123,7 +84,7 @@ void single_cf_gridder::add_to_grid(std::complex<double>* grid, long* grid_shape
                                     }
                                 }
 
-                                sum_weight[a_chan * n_pol + a_pol] += sel_weight * norm;
+                                //sum_weight[a_chan * n_pol + a_pol] += sel_weight * norm;
                             }
                         }
                     }
@@ -132,6 +93,144 @@ void single_cf_gridder::add_to_grid(std::complex<double>* grid, long* grid_shape
         }
     }
 }
+
+
+std::pair<int, int> single_cf_gridder::grid(int image_size, int n_time_chunks, int n_chan_chunks)
+{
+    
+    double field_of_view = 60*M_PI/(180*3600);
+    int oversampling = 100;
+    int support = 7;
+    int n_imag_pol = 2;
+
+    auto cgk_1D = create_prolate_spheroidal_kernel_1d(oversampling, support);
+    vector<double> delta_lm = {field_of_view/static_cast<double>(image_size), field_of_view/static_cast<double>(image_size)};
+    
+    int data_load_time = 0;
+    int gridding_time = 0;
+
+
+    complex<double>* vis;
+    double* weight;
+    double* uvw;
+    double* chan;
+    long* vis_shape;
+    
+//    int grid_size = n_imag_chan*n_imag_pol*image_size*image_size;
+//    std::vector<std::complex<double>> grid;
+//    grid.resize(grid_size, std::complex<double>(0.0, 0.0));
+//    vector<long> grid_shape = {n_imag_chan, n_imag_pol, image_size, image_size};
+//    std::complex<double>* grid_ptr = grid.data();
+//
+//    std::vector<double> sum_weight;
+//    sum_weight.resize(n_imag_chan*n_imag_pol, 0.0);
+//    double* sum_weight_ptr = sum_weight.data();
+    
+    int chan_chunk_size = 2;
+    int grid_size = chan_chunk_size*n_chan_chunks*n_imag_pol*image_size*image_size;
+    cout << "grid_size " << grid_size << ",*," << chan_chunk_size << ",*," << n_chan_chunks << ",*," << n_imag_pol << ",*," << image_size <<  endl;
+    //std::vector<std::complex<double>> grid(grid_size,std::complex<double>(0.0, 0.0));
+    create_grid(chan_chunk_size*n_chan_chunks, n_imag_pol, image_size);
+    
+    
+    //std::vector<std::complex<double>> grid;
+    //grid.resize(grid_size, std::complex<double>(0.0, 0.0));
+    
+    
+    vector<long> grid_shape = {chan_chunk_size*n_chan_chunks, n_imag_pol, image_size, image_size};
+    //std::complex<double>* grid_ptr = grid.data();
+
+    //std::vector<double> sum_weight;
+    //sum_weight.resize(chan_chunk_size*n_chan_chunks*n_imag_pol, 0.0);
+    std::vector<double> sum_weight(chan_chunk_size*n_chan_chunks*n_imag_pol, 0.0);
+    double* sum_weight_ptr = sum_weight.data();
+    
+    
+    //size_t memory_reserved = sizeof(std::complex<double>) * grid.size();
+    //std::cout << "Memory reserved: " << memory_reserved/(1024.0*1024.0*1024.0) << " GiB" << std::endl;
+
+
+
+
+
+
+    std::chrono::high_resolution_clock::time_point start;
+    std::chrono::high_resolution_clock::time_point end;
+
+    std::vector<double> chan_slice;
+    std::vector<long> chan_map;
+    std::vector<long> pol_map;
+
+    int start_index;
+    int end_index;
+    int k;
+
+    for (int i_time_chunk = 0; i_time_chunk < n_time_chunks; ++i_time_chunk) {
+       for (int i_chan_chunk = 0; i_chan_chunk < n_chan_chunks; ++i_chan_chunk)
+       {
+           start = chrono::high_resolution_clock::now();
+           //open_no_dask_zarr(&vis,&weight,&uvw,&chan,&vis_shape,"/Users/jsteeb/Library/CloudStorage/Dropbox/performance_eval/data/ngvla_sim.vis.zarr", i_time_chunk, i_chan_chunk);
+           open_no_dask_zarr(&vis,&weight,&uvw,&chan,&vis_shape,"/.lustre/cv/users/jsteeb/ngvla_sim.vis.zarr", i_time_chunk, i_chan_chunk);
+           
+           //memory_reserved = sizeof(std::complex<double>) * vis_shape[0]* vis_shape[1]* vis_shape[2]* vis_shape[3];
+           //std::cout << "Memory reserved: " << memory_reserved/(1024.0*1024.0*1024.0) << " GiB" << std::endl;
+
+           chan_slice.resize(vis_shape[2]);
+           chan_map.resize(vis_shape[2]);
+           pol_map.resize(vis_shape[3]);
+
+           start_index = i_chan_chunk * vis_shape[2];
+           end_index = (i_chan_chunk + 1) * vis_shape[2];
+           k = 0;
+           for (long i = start_index; i < end_index; ++i) {
+               chan_map[k] = i;
+               chan_slice[k] = chan[i];
+               //cout << "chan_map " << k << ",*," << chan_map[k] << ",*," << chan_slice[k] << endl;
+               k++;
+           }
+
+           for (long i = 0; i < vis_shape[3]; ++i) {
+                pol_map[i] = i;
+                //cout << "pol_map " << i << ",*," << pol_map[i] << endl;
+           }
+
+           end = chrono::high_resolution_clock::now();
+           data_load_time = data_load_time + chrono::duration_cast<chrono::milliseconds>(end - start).count();
+
+
+           start = chrono::high_resolution_clock::now();
+           add_to_grid(grid_shape.data(), sum_weight_ptr, vis, vis_shape, uvw, chan, chan_map.data(), pol_map.data(), weight, cgk_1D.data(), delta_lm.data(), support, oversampling);
+           end = chrono::high_resolution_clock::now();
+           cout << "*Grid time " <<  chrono::duration_cast<chrono::milliseconds>(end - start).count() << endl;
+           gridding_time = gridding_time + chrono::duration_cast<chrono::milliseconds>(end - start).count();
+
+           delete[] vis;
+           delete[] uvw;
+           delete[] weight;
+           delete[] chan;
+           delete[] vis_shape;
+       }
+    }
+    
+    //cout << "the grid is " << grid[125250] << endl;
+    
+    cout << "Data load time " << data_load_time << endl;
+    cout << "Data gridding time " << gridding_time << endl;
+    cout << image_size << ",*," << n_time_chunks << ",*," << n_chan_chunks << endl;
+    
+    return std::make_pair(data_load_time, gridding_time);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 std::vector<double> single_cf_gridder::create_prolate_spheroidal_kernel_1d(int oversampling, int support) {

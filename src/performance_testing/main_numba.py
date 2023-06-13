@@ -50,8 +50,8 @@ def grid(n_time_chunks,n_chan_chunks,image_size):
             
             start = time.time()
             var_select = ['DATA','UVW','WEIGHT']
-            vis_ds = _open_no_dask_zarr('/Users/jsteeb/Dropbox/performance_eval/data/ngvla_sim.vis.zarr',slice_dict={'time':time_slice,'chan':chan_slice},var_select=var_select)
-            
+#            vis_ds = _open_no_dask_zarr('/Users/jsteeb/Dropbox/performance_eval/data/ngvla_sim.vis.zarr',slice_dict={'time':time_slice,'chan':chan_slice},var_select=var_select)
+            vis_ds = _open_no_dask_zarr('/.lustre/cv/users/jsteeb/ngvla_sim.vis.zarr',slice_dict={'time':time_slice,'chan':chan_slice},var_select=var_select)
             #print(vis_ds)
 
             vis_data = vis_ds.DATA.values

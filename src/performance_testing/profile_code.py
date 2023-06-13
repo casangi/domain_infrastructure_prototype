@@ -25,12 +25,13 @@ def profile_code(name,profile_results_name,is_python,image_size_list,n_time_chun
     memory_profiling_pd = pd.DataFrame()
     profiling_list = []
     
-    memory_column_labels = ['date_time','total_compute_time','total_gridding_time','total_load_data_time','n_time_chunks','n_chan_chunks','image_size','rss','vms','mem','pfaults','pageins']
+    memory_column_labels = ['date_time','total_compute_time','total_gridding_time','total_load_data_time','n_time_chunks','n_chan_chunks','image_size','rss','vms','mem']
     column_labels = ['date_time','n_time_chunks','n_chan_chunks','image_size','total_compute_time','total_gridding_time','total_load_data_time','max_rss','max_vms','max_mem']
     
     for n_time_chunks in n_time_chunks_list:
         for n_chan_chunks in n_chan_chunks_list:
             for image_size in image_size_list:
+                print(n_time_chunks,n_chan_chunks,image_size)
             
                 if is_python:
                     print(' '.join(["python", name, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks)]))
@@ -61,71 +62,72 @@ def profile_code(name,profile_results_name,is_python,image_size_list,n_time_chun
                         
                         mem_measurement = 0
                         
-                        start = time.time()
-                        sub_process_top = subprocess.Popen(["top","-l 2"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) #,"-pid "+pid
+#                        start = time.time()
+#                        sub_process_top = subprocess.Popen(["top","-l 2"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) #,"-pid "+pid
                         time.sleep(sampling_interval)
-                        stdout_top, stderr_top = sub_process_top.communicate()
-                        sub_process_top.terminate()
-                        #print('1 Time ',time.time()-start)
-
-                        start = time.time()
-                        top_lines = str(stdout_top).split('\\n')
-
-
-                        #print(top_lines[0:30])
-                        for line in top_lines:
-                            if 'PID' in line:
-                                line_split = line.split(' ')
-
-                                found_index = -1
-                                for l in line_split:
-                                    if (l != '') and (l != ' '):
-                                        found_index = found_index+1
-                                    if l == 'MEM':
-                                        break
-
-                            if pid in line:
-                                #print('*'*10)
-                                #print(line)
-                                #print('*'*10)
-                                line_split = line.split(' ')
-                                index = 0
-                                for l in line_split:
-                                    if (l != '') and (l != ' ') :
-                                        if index==found_index:
-                                            mem_str = l
-                                            break
-                                        index = index+1
-
-                                #print('mem_str',mem_str)
-                                mem_units = ''.join([char for char in mem_str if char.isalpha()])
-                                #print('**',''.join([char for char in mem_str if char.isdigit()]))
-                                mem_digit = float(''.join([char for char in mem_str if char.isdigit()]))
-
-                                if 'B' in mem_units:
-                                    mem_temp = mem_digit/(1024*1024*1024)
-                                elif 'K' in mem_units:
-                                    mem_temp = mem_digit/(1024*1024)
-                                elif 'M' in mem_units:
-                                    mem_temp = mem_digit/(1024)
-                                else:
-                                    mem_temp = mem_digit
-
-                                #print("@@@",mem_measurement, mem_temp)
-                                if mem_measurement < mem_temp:
-                                    mem_measurement = mem_temp
-
-                                #print(mem_measurement,mem_str,mem_units,mem_digit)
-
-                        #print('2 Time ',time.time()-start)
+#                        stdout_top, stderr_top = sub_process_top.communicate()
+#                        sub_process_top.terminate()
+#                        #print('1 Time ',time.time()-start)
+#
+#                        start = time.time()
+#                        top_lines = str(stdout_top).split('\\n')
+#
+#
+#                        #print(top_lines[0:30])
+#                        for line in top_lines:
+#                            if 'PID' in line:
+#                                line_split = line.split(' ')
+#
+#                                found_index = -1
+#                                for l in line_split:
+#                                    if (l != '') and (l != ' '):
+#                                        found_index = found_index+1
+#                                    if l == 'MEM':
+#                                        break
+#
+#                            if pid in line:
+#                                #print('*'*10)
+#                                #print(line)
+#                                #print('*'*10)
+#                                line_split = line.split(' ')
+#                                index = 0
+#                                for l in line_split:
+#                                    if (l != '') and (l != ' ') :
+#                                        if index==found_index:
+#                                            mem_str = l
+#                                            break
+#                                        index = index+1
+#
+#                                #print('mem_str',mem_str)
+#                                mem_units = ''.join([char for char in mem_str if char.isalpha()])
+#                                #print('**',''.join([char for char in mem_str if char.isdigit()]))
+#                                mem_digit = float(''.join([char for char in mem_str if char.isdigit()]))
+#
+#                                if 'B' in mem_units:
+#                                    mem_temp = mem_digit/(1024*1024*1024)
+#                                elif 'K' in mem_units:
+#                                    mem_temp = mem_digit/(1024*1024)
+#                                elif 'M' in mem_units:
+#                                    mem_temp = mem_digit/(1024)
+#                                else:
+#                                    mem_temp = mem_digit
+#
+#                                #print("@@@",mem_measurement, mem_temp)
+#                                if mem_measurement < mem_temp:
+#                                    mem_measurement = mem_temp
+#
+#                                #print(mem_measurement,mem_str,mem_units,mem_digit)
+#
+#                        #print('2 Time ',time.time()-start)
                         
                         mem.append(mem_measurement)
                         rss.append(memory_info.rss / (1024 * 1024 * 1024)) # GB
                         vms.append(memory_info.vms / (1024 * 1024 * 1024))
-                        pfaults.append(memory_info.pfaults)
-                        pageins.append(memory_info.pageins)
+                        #pfaults.append(memory_info.pfaults)
+                        #pageins.append(memory_info.pageins)
                         #print('^&*^&&^*',mem_measurement,memory_info.rss / (1024 * 1024 * 1024),memory_info.vms / (1024 * 1024 * 1024))
                         #print('\n')
+                        #print(memory_info)
                         
                     except:
                         process_done = True
@@ -154,18 +156,17 @@ def profile_code(name,profile_results_name,is_python,image_size_list,n_time_chun
 
                 profiling_list.append([current_datetime,n_time_chunks,n_chan_chunks,image_size,total_compute_time,total_gridding_time, total_data_load_time, max_rss,max_vms, max_mem])
                 print([current_datetime,n_time_chunks,n_chan_chunks,image_size,total_compute_time, total_gridding_time, total_data_load_time, max_rss,max_vms,max_mem])
+                #print(len(rss),len(vms),len(mem),len(pfaults),len(pageins))
 
-                sub_memory_profiling_pd = pd.DataFrame({label: array for label, array in zip(memory_column_labels, [[current_datetime]*len(rss),[total_compute_time]*len(rss),[total_gridding_time]*len(rss), [total_data_load_time]*len(rss), [n_time_chunks]*len(rss),[n_chan_chunks]*len(rss),[image_size]*len(rss),rss,vms,mem,pfaults,pageins])})
+                sub_memory_profiling_pd = pd.DataFrame({label: array for label, array in zip(memory_column_labels, [[current_datetime]*len(rss),[total_compute_time]*len(rss),[total_gridding_time]*len(rss), [total_data_load_time]*len(rss), [n_time_chunks]*len(rss),[n_chan_chunks]*len(rss),[image_size]*len(rss),rss,vms,mem])})
                 memory_profiling_pd = pd.concat([memory_profiling_pd, sub_memory_profiling_pd], ignore_index=True)
 
-                profiling_pd = pd.DataFrame()
 
-    memory_profiling_pd.to_excel(profile_results_name+'_memory_profiling.xlsx',index=False)
-
+    profiling_pd = pd.DataFrame()
+    print(memory_profiling_pd)
+    memory_profiling_pd.to_csv(profile_results_name+'_memory_profiling.xlsx',index=False)
     profiling_pd = pd.DataFrame(profiling_list, columns=column_labels)
     profiling_pd.to_excel(profile_results_name+'_memory_profiling.xlsx',index=False)
-
-    print(memory_profiling_pd)
     print('*'*100)
     print(profiling_pd)
 
@@ -182,10 +183,12 @@ if __name__ == "__main__":
     
     #image_size = [500, 1000, 1500, 2000, 2500, 5000]
     image_size = [5000]
-    n_chan_chunks_list = [1]
-    profile_code(name="main_numba.py",profile_results_name="mac_numba",is_python=True,image_size_list=image_size,n_time_chunks_list=[1],n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.001)
-    profile_code(name="main_pybind11.py",profile_results_name="mac_pybind11",is_python=True,image_size_list=image_size,n_time_chunks_list=[1],n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.001)
-    profile_code(name="cpp_gridder",profile_results_name="mac_cpp",is_python=False,image_size_list=image_size,n_time_chunks_list=[1],n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.001)
+    n_chan_chunks_list = [10]
+    n_time_chunks_list = [1]
+    
+    profile_code(name="cpp_gridder",profile_results_name="linux_cpp",is_python=False,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
+    profile_code(name="main_numba.py",profile_results_name="linux_numba",is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
+    profile_code(name="main_pybind11.py",profile_results_name="linux_pybind11",is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
 
 
 

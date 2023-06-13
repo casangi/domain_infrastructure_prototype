@@ -1,12 +1,5 @@
-#c++ -O3 -Wall -shared -std=c++14 -I /Users/jsteeb/mambaforge-pypy3/envs/zinc11/include/ -I /Users/jsteeb/mambaforge-pypy3/envs/zinc11/include/xtl/ -I /Users/jsteeb/mambaforge-pypy3/envs/zinc11/lib/python3.11/site-packages/numpy/core/include  -undefined dynamic_lookup $(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp gridder/single_cf_gridder.cpp -o bin/pybind11_wrapper$(python3-config --extension-suffix)
-
 #Linux
-#g++ -O3 -shared -std=c++17 -I /users/jsteeb/mambaforge/envs/zinc/include -fPIC $(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp gridder/single_cf_gridder.cpp -o bin/pybind11_wrapper$(python3-config --extension-suffix) -L/usr/local/lib -lstdc++ -lzstd
-
-#g++ -O3 -shared -std=c++17 -I /users/jsteeb/mambaforge/envs/zinc/include -fPIC $(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp gridder/single_cf_gridder.cpp -o bin/pybind11_wrapper$(python3-config --extension-suffix) -lzstd
-
 #g++ -O3 -shared -std=c++17 -I /users/jsteeb/mambaforge/envs/zinc/include -fPIC $(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp gridder/single_cf_gridder.cpp data_io/zarr_reader.cpp -o bin/pybind11_wrapper$(python3-config --extension-suffix) -lzstd
-
 
 import os
 import linecache
@@ -102,9 +95,10 @@ def grid(n_time_chunks,n_chan_chunks,image_size):
 
 def main(image_size,n_time_chunks,n_chan_chunks):
     start = time.time()
-    data_load_time, gridding_time = grid(n_time_chunks,n_chan_chunks,image_size)
+    gridder = py11.single_cf_gridder_pybind()
+    data_load_time, gridding_time = gridder.grid(image_size, n_time_chunks, n_chan_chunks)
     compute_time = time.time() - start
-    print(compute_time, gridding_time, data_load_time)
+    print(compute_time, gridding_time/1000, data_load_time/1000)
 
     return
 
@@ -142,6 +136,7 @@ c++ -O3 -Wall -shared -std=c++14 -undefined dynamic_lookup $(python3 -m pybind11
 #python main_pybind11.py --image_size 500 --n_time_chunks 1 --n_chan_chunks 1
 
 '''
+
 
 
 

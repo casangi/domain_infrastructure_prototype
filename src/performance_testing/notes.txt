@@ -16,6 +16,8 @@ pip install numpy scipy numba==0.57.0 pybind11 zarr astropy xarray
 
 
 mamba install -c conda-forge boosts
+mamba install zstd zstd-static --channel conda-forge
+mamba install -c conda-forge nlohmann_jsonY
 
 
 #Release the GIL
