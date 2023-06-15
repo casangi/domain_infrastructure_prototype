@@ -1,4 +1,5 @@
 //Linux
+//gcc -O3 -std=c++17 -I /mnt/condor/jsteeb/dip/dip_3_11/include -o bin/cpp_gridder  gridder/single_cf_gridder.cpp main.cpp data_io/zarr_reader.cpp  -L/usr/local/lib -lstdc++ -lzstd -lm
 
 //gcc -O3 -std=c++17 -I /users/jsteeb/mambaforge/envs/zinc/include -o bin/cpp_gridder  gridder/single_cf_gridder.cpp main.cpp data_io/zarr_reader.cpp  -L/usr/local/lib -lstdc++ -lzstd -lm
 

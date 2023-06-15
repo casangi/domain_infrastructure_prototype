@@ -18,6 +18,8 @@ public:
   void create_grid(long n_imag_chan, long n_imag_pol, long image_size);
   // pass_grid
     
+  void set_grid(std::complex<double>* grid);
+    
   void add_to_grid(long* grid_shape, double* sum_weight, std::complex<double>* vis_data, long* vis_shape, double* uvw, double* freq_chan, long* chan_map, long* pol_map, double* weight, double* cgk_1D, double* delta_lm, int support, int oversampling);
     
   std::vector<double> create_prolate_spheroidal_kernel_1d(int oversampling, int support);
@@ -27,6 +29,7 @@ public:
 
 private:
     std::vector<std::complex<double>> internal_grid;
+    std::complex<double>* grid_ptr;
     bool use_internal_grid;
     bool grid_set;
 };

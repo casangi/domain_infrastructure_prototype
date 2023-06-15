@@ -21,10 +21,10 @@ def grid(n_time_chunks,n_chan_chunks,image_size):
     data_load_time = 0
     gridding_time = 0
     #grid = np.zeros((n_imag_chan, n_imag_pol, image_size, image_size), dtype=np.complex128)
-    grid = np.zeros((n_chan_chunks*chan_chunk_size, n_imag_pol, image_size, image_size), dtype=np.complex128)
+    #grid = np.zeros((n_chan_chunks*chan_chunk_size, n_imag_pol, image_size, image_size), dtype=np.complex128)
     #grid = np.full((n_imag_chan, n_imag_pol, image_size, image_size), np.complex128(0.0))
     #grid = np.full((n_chan_chunks*chan_chunk_size, n_imag_pol, image_size, image_size), np.complex128(0.0))
-    
+    grid = np.full((n_chan_chunks*chan_chunk_size, n_imag_pol, image_size, image_size), np.complex128(0.0), dtype=np.complex128)
     
     #print('grid size', grid.nbytes/(1024*1024*1024), grid.size * grid.itemsize,grid.shape)
     grid_shape = np.array(grid.shape)
@@ -51,7 +51,7 @@ def grid(n_time_chunks,n_chan_chunks,image_size):
             start = time.time()
             var_select = ['DATA','UVW','WEIGHT']
 #            vis_ds = _open_no_dask_zarr('/Users/jsteeb/Dropbox/performance_eval/data/ngvla_sim.vis.zarr',slice_dict={'time':time_slice,'chan':chan_slice},var_select=var_select)
-            vis_ds = _open_no_dask_zarr('/.lustre/cv/users/jsteeb/ngvla_sim.vis.zarr',slice_dict={'time':time_slice,'chan':chan_slice},var_select=var_select)
+            vis_ds = _open_no_dask_zarr('/mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr' ,slice_dict={'time':time_slice,'chan':chan_slice},var_select=var_select)
             #print(vis_ds)
 
             vis_data = vis_ds.DATA.values

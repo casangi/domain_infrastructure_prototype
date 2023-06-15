@@ -11,19 +11,32 @@ using namespace std;
 single_cf_gridder::single_cf_gridder()
 {
     use_internal_grid = false;
-    grid_set = false;
 }
+
+void single_cf_gridder::set_grid(std::complex<double>* grid)
+{
+    grid_ptr = grid;
+    use_internal_grid = false;
+}
+
 
 void single_cf_gridder::create_grid(long n_imag_chan,long n_imag_pol,long image_size)
 {
     int grid_size = n_imag_chan*n_imag_pol*image_size*image_size;
     internal_grid.resize(grid_size,std::complex<double>(0.0, 0.0));
-    grid_set = true;
+    use_internal_grid = true;
 }
 
 void single_cf_gridder::add_to_grid(long* grid_shape, double* sum_weight, std::complex<double>* vis_data, long* vis_shape, double* uvw, double* freq_chan, long* chan_map, long* pol_map, double* weight, double* cgk_1D, double* delta_lm, int support, int oversampling) {
     
-    std::complex<double>* grid = internal_grid.data();
+    std::complex<double>* grid;
+    
+    if(use_internal_grid){
+        grid = internal_grid.data();
+    }else{
+        grid = grid_ptr;
+    }
+        
 
     int n_time = vis_shape[0];
     int n_baseline = vis_shape[1];
@@ -84,7 +97,7 @@ void single_cf_gridder::add_to_grid(long* grid_shape, double* sum_weight, std::c
                                     }
                                 }
 
-                                //sum_weight[a_chan * n_pol + a_pol] += sel_weight * norm;
+                                sum_weight[a_chan * n_pol + a_pol] += sel_weight * norm;
                             }
                         }
                     }
@@ -170,7 +183,7 @@ std::pair<int, int> single_cf_gridder::grid(int image_size, int n_time_chunks, i
        {
            start = chrono::high_resolution_clock::now();
            //open_no_dask_zarr(&vis,&weight,&uvw,&chan,&vis_shape,"/Users/jsteeb/Library/CloudStorage/Dropbox/performance_eval/data/ngvla_sim.vis.zarr", i_time_chunk, i_chan_chunk);
-           open_no_dask_zarr(&vis,&weight,&uvw,&chan,&vis_shape,"/.lustre/cv/users/jsteeb/ngvla_sim.vis.zarr", i_time_chunk, i_chan_chunk);
+           open_no_dask_zarr(&vis,&weight,&uvw,&chan,&vis_shape,"/mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr", i_time_chunk, i_chan_chunk);
            
            //memory_reserved = sizeof(std::complex<double>) * vis_shape[0]* vis_shape[1]* vis_shape[2]* vis_shape[3];
            //std::cout << "Memory reserved: " << memory_reserved/(1024.0*1024.0*1024.0) << " GiB" << std::endl;
