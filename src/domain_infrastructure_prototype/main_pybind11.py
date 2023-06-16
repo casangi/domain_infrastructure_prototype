@@ -92,10 +92,10 @@ def grid(n_time_chunks,n_chan_chunks,image_size,set_grid):
               
             
             #Stops memory spikes
-#            del uvw
-#            del weight
-#            del vis_data
-#            del vis_ds
+            del uvw
+            del weight
+            del vis_data
+            del vis_ds
             
     
 #    plt.figure()

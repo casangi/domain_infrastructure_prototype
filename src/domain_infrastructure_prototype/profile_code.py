@@ -15,7 +15,7 @@ def find_index(line_split,target):
     return found_index
 
 
-def profile_code(name,profile_results_name,is_python,image_size_list,n_time_chunks_list,n_chan_chunks_list,sampling_interval):
+def profile_code(name,profile_results_name,is_python,image_size_list,n_time_chunks_list,n_chan_chunks_list,sampling_interval,set_grid='false'):
 
     if is_python:
         process_name = "python " + name
@@ -31,10 +31,14 @@ def profile_code(name,profile_results_name,is_python,image_size_list,n_time_chun
     for n_time_chunks in n_time_chunks_list:
         for n_chan_chunks in n_chan_chunks_list:
             for image_size in image_size_list:
-
+            
                 if is_python:
-                    print(' '.join(["python", name, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks)]))
-                    sub_process = subprocess.Popen(["python", name, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    if name=="main_pybind11.py":
+                        print(' '.join(["python", name, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks),"--set_grid",set_grid]))
+                        sub_process = subprocess.Popen(["python", name, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks),"--set_grid",set_grid], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    else:
+                        print(' '.join(["python", name, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks)]))
+                        sub_process = subprocess.Popen(["python", name, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 else:
                 #./bin/cpp_gridder 500 1 2
                     print(' '.join(["./bin/"+name, " ", str(image_size)," ",str(n_time_chunks)," ",str(n_chan_chunks)]))
@@ -63,12 +67,11 @@ def profile_code(name,profile_results_name,is_python,image_size_list,n_time_chun
                     
                     
                 stdout, stderr = sub_process.communicate()
-                #print(stdout)
+                print(stdout)
                 
                 compute_time_str = str(stdout).split('\\n')[-2]
 
-                #print('&&&&&&&&&',stdout)
-                #print('*****',compute_time_str, compute_time_str[0], compute_time_str[2:])
+                print('*****',compute_time_str, compute_time_str[0], compute_time_str[2:])
 
                 if compute_time_str[0] == 'b':
                     compute_time_str = compute_time_str[2:].split(' ')
@@ -114,18 +117,19 @@ if __name__ == "__main__":
 #    profile_code(name="main_pybind11.py",profile_results_name="mac_pybind11",is_python=True,image_size_list=[200,500],n_time_chunks_list=[3],n_chan_chunks_list=[3],sampling_interval=0.5)
     
     #image_size = [500, 1000, 1500, 2000, 2500, 5000]
-#    image_size = [500, 1000, 1500, 2000, 2500, 5000]
-#    n_chan_chunks_list = [1, 3, 5, 8, 10]
-#    n_time_chunks_list = [1, 3, 5, 8, 10]
+    image_size = [500, 1000, 1500, 2000, 2500, 5000]
+    n_chan_chunks_list = [1, 3, 5, 8, 10]
+    n_time_chunks_list = [1, 3, 5, 8, 10]
 
     
-    image_size = [5000]
-    n_chan_chunks_list = [10]
-    n_time_chunks_list = [1]
+#    image_size = [500]
+#    n_chan_chunks_list = [2]
+#    n_time_chunks_list = [2]
     
     profile_code(name="cpp_gridder",profile_results_name="linux_cpp",is_python=False,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
     profile_code(name="main_numba.py",profile_results_name="linux_numba",is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
-    profile_code(name="main_pybind11.py",profile_results_name="linux_pybind11",is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
+    profile_code(name="main_pybind11.py",profile_results_name="linux_pybind11_cpp_grid",is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='false')
+    profile_code(name="main_pybind11.py",profile_results_name="linux_pybind11",is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='true')
     profile_code(name="main_pybind11_cpp_only.py",profile_results_name="linux_pybind11_cpp_only",is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
 
 
