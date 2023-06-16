@@ -77,8 +77,8 @@ def grid(n_time_chunks,n_chan_chunks,image_size,set_grid):
             data_load_time = data_load_time + (time.time() - start)
             
             #gridder.create_array(40000000)
-            print('chan_map',chan_map,freq_chan)
-            print('pol_map',pol_map)
+            #print('chan_map',chan_map,freq_chan)
+            #print('pol_map',pol_map)
 
 
             #complex128 int64 float64 complex128 int64 float64      int64    int64 int64 float64 float64 float64 <class 'int'> <class 'int'>
@@ -89,18 +89,60 @@ def grid(n_time_chunks,n_chan_chunks,image_size,set_grid):
             #gridder.grid_vis_data(grid,grid_shape,sum_weight,vis_data,vis_shape,uvw, freq_chan, chan_map, pol_map, weight, cgk_1D, delta_lm, support, oversampling)
             gridder.add_to_grid(grid_shape,sum_weight,vis_data,vis_shape,uvw, freq_chan, chan_map, pol_map, weight, cgk_1D, delta_lm, support, oversampling)
             gridding_time = gridding_time + (time.time() -  start)
+              
             
             #Stops memory spikes
-            del uvw
-            del weight
-            del vis_data
-            del vis_ds
+#            del uvw
+#            del weight
+#            del vis_data
+#            del vis_ds
             
     
 #    plt.figure()
 #    plt.imshow(np.abs(grid[0,0,:,:]))
 #    plt.colorbar()
 #    plt.show()
+
+#    def to_flat_index(index_4d):
+#        return index_4d[0]*5000*5000*2 + index_4d[1]*5000*5000 + index_4d[2]*5000 + index_4d[2];
+#
+#    pixel_list = [[0,0,2500,2500],[0,1,2500,2500],[5,0,2500,2500],[5,1,2500,2500],[10,0,2500,2500],[10,1,2500,2500],[19,0,2500,2500],[19,1,2500,2500]];
+#    print(grid[0,0,2500,2500],grid[0,1,2500,2500],grid[5,0,2500,2500],grid[5,1,2500,2500],grid[10,0,2500,2500],grid[10,1,2500,2500],grid[19,0,2500,2500],grid[19,1,2500,2500])
+#
+#    print(sum_weight)
+#    print(list(map(to_flat_index,pixel_list)))
+    
+    #numpy.ravel_multi_index(multi_index=[10,1,2500,2500], dims=[20,2,5000,5000], order='C')
+
+    #[12502500, 37502500, 262502500, 287502500, 512502500, 537502500, 962502500, 987502500]
+
+# Grid values (-0.10697631072328591+0.0578030094901381j) (-0.10697631072328591+0.0578030094901381j) (0.0002800174907041966+0.0009681689039663092j) (0.0002800174907041966+0.0009681689039663092j) 0j 0j 0j 0j
+
+#chan_map [18 19] [3.873e+11 4.073e+11]
+# pol_map [0 1]
+
+# sum of weight
+#    [[55182225.01427166 55182225.01427166]
+# [51649585.6556574  51649585.6556574 ]
+# [49453205.17748479 49453205.17748479]
+# [48270115.14828864 48270115.14828864]
+# [47397977.41040695 47397977.41040695]
+# [46458583.60066321 46458583.60066321]
+# [45701915.42228861 45701915.42228861]
+# [44566976.31561698 44566976.31561698]
+# [43489558.52853308 43489558.52853308]
+# [42551810.30028976 42551810.30028976]
+# [41324663.38560001 41324663.38560001]
+# [40295792.13948147 40295792.13948147]
+# [39643588.16421303 39643588.16421303]
+# [39039302.56585391 39039302.56585391]
+# [38310098.18830668 38310098.18830668]
+# [37694651.74131018 37694651.74131018]
+# [37032157.12556891 37032157.12556891]
+# [36192355.67040902 36192355.67040902]
+# [35503173.49673673 35503173.49673673]
+# [34786737.28330411 34786737.28330411]]
+
     return data_load_time, gridding_time
 
 

@@ -36,6 +36,16 @@ void single_cf_gridder::add_to_grid(long* grid_shape, double* sum_weight, std::c
     }else{
         grid = grid_ptr;
     }
+    
+//    cout << "1. **********************" << endl;
+//    cout << "grid_shape " << grid_shape[0] << ",*," << grid_shape[1] << ",*," << grid_shape[2] << ",*," << grid_shape[3] << endl;
+//    cout << "vis_shape " << vis_shape[0] << ",*," << vis_shape[1] << ",*," << vis_shape[2] << ",*," << vis_shape[3] << endl;
+//    cout << "vis_shape " << chan_map[0] << ",*," << freq_chan[0] << ",*," << chan_map[1] << ",*," << freq_chan[1] << endl;
+//    cout << " cgk_1D" << cgk_1D[0] << ",*," << cgk_1D[1] << ",*," << cgk_1D[2] << ",*," << cgk_1D[100] << ",*," << endl;
+//    cout << "delta_lm" << delta_lm[0] << ",*," << delta_lm[1] << endl;
+//
+//
+//    cout << "2. **********************" << endl;
         
 
     int n_time = vis_shape[0];
@@ -84,12 +94,12 @@ void single_cf_gridder::add_to_grid(long* grid_shape, double* sum_weight, std::c
 
                                 for (int i_v = start_support; i_v < end_support; i_v++) {
                                     int v_indx = v_center_indx + i_v;
-                                    int v_offset_indx = std::abs(static_cast<int>(oversampling * i_v + v_center_offset_indx));
+                                    int v_offset_indx = std::abs(oversampling * i_v + v_center_offset_indx);
                                     double conv_v = cgk_1D[v_offset_indx];
 
                                     for (int i_u = start_support; i_u < end_support; i_u++) {
                                         int u_indx = u_center_indx + i_u;
-                                        int u_offset_indx = std::abs(static_cast<int>(oversampling * i_u + u_center_offset_indx));
+                                        int u_offset_indx = std::abs(oversampling * i_u + u_center_offset_indx);
                                         double conv_u = cgk_1D[u_offset_indx];
                                         double conv = conv_u * conv_v;
                                         grid[a_chan * n_pol * n_u * n_v + a_pol * n_u * n_v + u_indx * n_v + v_indx] += conv * weighted_data;
@@ -158,6 +168,14 @@ std::pair<int, int> single_cf_gridder::grid(int image_size, int n_time_chunks, i
     std::vector<double> sum_weight(chan_chunk_size*n_chan_chunks*n_imag_pol, 0.0);
     double* sum_weight_ptr = sum_weight.data();
     
+//    cout  << "****************" << endl;
+//    for (int i_chan = 0; i_chan < chan_chunk_size*n_chan_chunks; ++i_chan) {
+//        for (int i_pol = 0; i_pol < n_imag_pol; ++i_pol){
+//            cout << "sum_weight " << i_chan*n_imag_pol + i_pol << ",*," << sum_weight[i_chan*n_imag_pol + i_pol] << endl;
+//        }
+//    }
+//    cout  << "****************" << endl;
+    
     
     //size_t memory_reserved = sizeof(std::complex<double>) * grid.size();
     //std::cout << "Memory reserved: " << memory_reserved/(1024.0*1024.0*1024.0) << " GiB" << std::endl;
@@ -212,7 +230,7 @@ std::pair<int, int> single_cf_gridder::grid(int image_size, int n_time_chunks, i
 
 
            start = chrono::high_resolution_clock::now();
-           add_to_grid(grid_shape.data(), sum_weight_ptr, vis, vis_shape, uvw, chan, chan_map.data(), pol_map.data(), weight, cgk_1D.data(), delta_lm.data(), support, oversampling);
+           add_to_grid(grid_shape.data(), sum_weight_ptr, vis, vis_shape, uvw, chan_slice.data(), chan_map.data(), pol_map.data(), weight, cgk_1D.data(), delta_lm.data(), support, oversampling);
            end = chrono::high_resolution_clock::now();
            cout << "*Grid time " <<  chrono::duration_cast<chrono::milliseconds>(end - start).count() << endl;
            gridding_time = gridding_time + chrono::duration_cast<chrono::milliseconds>(end - start).count();
@@ -224,9 +242,17 @@ std::pair<int, int> single_cf_gridder::grid(int image_size, int n_time_chunks, i
            delete[] vis_shape;
        }
     }
+   // std::complex<double>* grid = grid_ptr;
     
-    //cout << "the grid is " << grid[125250] << endl;
-    
+//    cout << "the grid is " << grid[12502500] << ",*," << grid[37502500] << ",*," << grid[262502500] << ",*," << grid[287502500] << ",*," << grid[512502500] << ",*," << grid[537502500] << ",*," << grid[962502500] << ",*," << grid[987502500] << endl;
+//
+//    cout  << "****************" << endl;
+//    for (int i_chan = 0; i_chan < chan_chunk_size*n_chan_chunks; ++i_chan) {
+//        for (int i_pol = 0; i_pol < n_imag_pol; ++i_pol){
+//            cout << "sum_weight " << i_chan*n_imag_pol + i_pol << " " << sum_weight[i_chan*n_imag_pol + i_pol] << endl;
+//        }
+//    }
+//    cout  << "****************" << endl;
     cout << "Data load time " << data_load_time << endl;
     cout << "Data gridding time " << gridding_time << endl;
     cout << image_size << ",*," << n_time_chunks << ",*," << n_chan_chunks << endl;
