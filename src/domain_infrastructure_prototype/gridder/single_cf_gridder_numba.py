@@ -16,6 +16,9 @@ def _standard_grid_jit(grid, grid_shape, sum_weight, vis_data, vis_shape, uvw, f
     n_u = grid_shape[2]
     n_v = grid_shape[3]
     c = 299792458.0
+    
+    support = 7
+    oversampling = 100
   
     support_center = int(support // 2)
     u_center = n_u // 2

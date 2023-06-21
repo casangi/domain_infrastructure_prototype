@@ -36,7 +36,7 @@ g++ -S -O3 -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include main.cpp gridder
 g++ -O0 -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include main.cpp gridder/single_cf_gridder.cpp data_io/zarr_reader.cpp -o bin/cpp_gridder -lzstd -g
 
 
-#################New Idea
+#################New Idea NB NB current
 g++ -c -O3 -std=c++17  -fPIC -I/mnt/condor/jsteeb/dip/dip_3_11/include data_io/zarr_reader.cpp -o obj/zarr_reader.o
 g++ -c -O3 -std=c++17  -fPIC -I/mnt/condor/jsteeb/dip/dip_3_11/include gridder/single_cf_gridder.cpp -o obj/single_cf_gridder.o
 
@@ -47,11 +47,124 @@ g++ -O3 -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fPIC $(pyt
 
 
 
+-fPIC saga:
+https://stackoverflow.com/questions/15861759/how-much-overhead-can-the-fpic-flag-add
+https://akkadia.org/drepper/dsohowto.pdf
+https://cseweb.ucsd.edu/~gbournou/CSE131/the_inside_story_on_shared_libraries_and_dynamic_loading.pdf
 
+g++ -O3 -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include main.cpp gridder/single_cf_gridder.cpp data_io/zarr_reader.cpp -o bin/cpp_gridder_nofPIC -lzstd 
+
+
+
+g++ -O3 -std=c++17 -flto -I/mnt/condor/jsteeb/dip/dip_3_11/include main.cpp obj/single_cf_gridder.o obj/zarr_reader.o -o bin/cpp_gridder -lzstd 
+
+
+
+
+
+
+g++ -c -O3 -std=c++17 -flto -fPIC -I/mnt/condor/jsteeb/dip/dip_3_11/include data_io/zarr_reader.cpp -o obj/zarr_reader_flto.o
+g++ -c -O3 -std=c++17 -flto -fPIC -I/mnt/condor/jsteeb/dip/dip_3_11/include gridder/single_cf_gridder.cpp -o obj/single_cf_gridder_flto.o
+g++ -O3 -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include main.cpp obj/single_cf_gridder_flto.o obj/zarr_reader_flto.o -o bin/cpp_gridder_flto -lzstd 
+
+
+g++ -O3 -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fPIC $(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp obj/single_cf_gridder_flto.o obj/zarr_reader_flto.o -o bin/pybind11_wrapper$(python3-config --extension-suffix) -lzstd
+
+g++ -O3 -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fpic $(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp obj/single_cf_gridder_flto.o obj/zarr_reader_flto.o -o bin/pybind11_wrapper$(python3-config --extension-suffix) -lzstd
+
+
+
+
+
+g++ -c -O3 -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include data_io/zarr_reader.cpp -o obj/zarr_reader_x.o
+g++ -c -O3 -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include gridder/single_cf_gridder.cpp -o obj/single_cf_gridder_x.o
+ar rcs lib/grid.a obj/zarr_reader_x.o obj/single_cf_gridder_x.o
+
+g++ -O3 -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include main.cpp obj/single_cf_gridder_x.o obj/zarr_reader_x.o -o bin/cpp_gridder_x -lzstd 
+
+
+
+g++ -O3 -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fpic $(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp obj/single_cf_gridder_x.o obj/zarr_reader_x.o -o bin/pybind11_wrapper$(python3-config --extension-suffix) -lzstd
+
+
+
+g++ -c -O3 -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include data_io/zarr_reader.cpp -o obj/zarr_reader_x.o
+g++ -c -O3 -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include gridder/single_cf_gridder.cpp -o obj/single_cf_gridder_x.o
+ar rcs lib/grid.a obj/zarr_reader_x.o obj/single_cf_gridder_x.o
+g++ -O3 -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fpic $(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp -Llib -l:grid.a -lzstd -o bin/pybind11_wrapper$(python3-config --extension-suffix)
+
+
+
+
+# Compile pybind11_wrapper.cpp with -fPIC
+g++ -O3 -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fpic $(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp -o obj/pybind11_wrapper.o
+
+# Link the static library and pybind11_wrapper.o
+g++ -O3 -shared obj/pybind11_wrapper.o -Llib -l:grid.a -lzstd -o bin/pybind11_wrapper$(python3-config --extension-suffix)
+
+
+
+
+Try -fno-semantic-interposition The magic!!!!!!!!!!!
+v1
+g++ -c -O3 -std=c++17 -fpic -fno-semantic-interposition -I/mnt/condor/jsteeb/dip/dip_3_11/include data_io/zarr_reader.cpp -o obj/zarr_reader.o
+g++ -c -O3 -std=c++17 -fpic -fno-semantic-interposition -I/mnt/condor/jsteeb/dip/dip_3_11/include gridder/single_cf_gridder.cpp -o obj/single_cf_gridder.o
+g++ -O3 -fno-semantic-interposition -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fpic $(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp obj/single_cf_gridder.o obj/zarr_reader.o -o bin/pybind11_wrapper$(python3-config --extension-suffix) -lzstd
+
+g++ -O3 -std=c++17 -fno-semantic-interposition -I/mnt/condor/jsteeb/dip/dip_3_11/include main.cpp obj/single_cf_gridder.o obj/zarr_reader.o -o bin/cpp_gridder -lzstd 
+
+
+
+clang -O3 -std=c++17 -fno-semantic-interposition -I/mnt/condor/jsteeb/dip/dip_3_11/include main.cpp gridder/single_cf_gridder.cpp data_io/zarr_reader.cpp -o bin/cpp_gridder_clang -lzstd 
+
+
+#Trying to see how assembly differs
+
+g++ -S -O3 -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include ../main.cpp ../gridder/single_cf_gridder.cpp ../data_io/zarr_reader.cpp -lzstd 
+
+g++ -S -O3 -fno-semantic-interposition  -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fpic $(python3 -m pybind11 --includes) ../gridder/pybind11_wrapper.cpp ../gridder/single_cf_gridder.cpp ../data_io/zarr_reader.cpp -lzstd
+
+
+g++ -S -O3 -fno-semantic-interposition -Wall -Wextra -fverbose-asm -march=haswell  -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fpic $(python3 -m pybind11 --includes) ../gridder/pybind11_wrapper.cpp ../gridder/single_cf_gridder.cpp ../data_io/zarr_reader.cpp -lzstd
+
+
+-O3 -Wall -Wextra -fverbose-asm -march=haswell
+
+
+
+v2
+g++ -Ofast -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include main.cpp gridder/single_cf_gridder.cpp data_io/zarr_reader.cpp -o bin/cpp_gridder -lzstd 
+
+g++ -Ofast -fno-semantic-interposition  -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fpic $(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp gridder/single_cf_gridder.cpp data_io/zarr_reader.cpp -o bin/pybind11_wrapper$(python3-config --extension-suffix) -lzstd
+//did not improve -flto
+
+
+
+./bin/cpp_gridder  1000   3   1
+python main_pybind11_cpp_only.py --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1
+python main_pybind11.py --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid true
+python main_pybind11.py --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid false
+python main_numba.py --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1
+
+
+https://github.com/pybind/pybind11/issues/2470
+
+
+Research
+https://stackoverflow.com/questions/74876047/how-to-build-a-c-non-pic-shared-library-that-links-to-a-static-library
+
+https://stackoverflow.com/questions/7865059/why-does-gcc-force-pic-for-x64-shared-libs   -mcmodel=large
+
+https://stackoverflow.com/questions/53086636/linking-a-static-library-into-a-shared-library-without-fpic
+
+http://maskray.me/blog/2021-05-09-fno-semantic-interposition. -fno-semantic-interposition
+
+https://stackoverflow.com/questions/35745543/new-option-in-gcc-5-3-fno-semantic-interposition
 
 
 ########################################
-
+./bin/cpp_gridder  1000   3   1
+python main_pybind11_cpp_only.py --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1
 
 
 ./bin/cpp_gridder   5000   1   3

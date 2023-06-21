@@ -29,6 +29,7 @@ void single_cf_gridder::create_grid(long n_imag_chan,long n_imag_pol,long image_
 
 void single_cf_gridder::add_to_grid(long* grid_shape, double* sum_weight, std::complex<double>* vis_data, long* vis_shape, double* uvw, double* freq_chan, long* chan_map, long* pol_map, double* weight, double* cgk_1D, double* delta_lm, int support, int oversampling) {
     
+    auto start = chrono::high_resolution_clock::now();
     std::complex<double>* grid;
     
     if(use_internal_grid){
@@ -56,6 +57,10 @@ void single_cf_gridder::add_to_grid(long* grid_shape, double* sum_weight, std::c
     int n_u = grid_shape[2];
     int n_v = grid_shape[3];
     double c = 299792458.0;
+    
+    
+    support = 7;
+    oversampling = 100;
 
     int support_center = support / 2;
     int u_center = n_u / 2;
@@ -115,6 +120,10 @@ void single_cf_gridder::add_to_grid(long* grid_shape, double* sum_weight, std::c
             }
         }
     }
+    
+    
+    auto end = chrono::high_resolution_clock::now();
+    cout << "@@@@@@ Grid time " <<  chrono::duration_cast<chrono::milliseconds>(end - start).count() << endl;
 }
 
 
