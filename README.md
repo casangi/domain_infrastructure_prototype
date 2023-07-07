@@ -1,8 +1,8 @@
 # Objectives 
-* To determine the suitability of Python as the language of the domain layer that controls:
-** Data access and iteration (visibility data).
-** Management of in-memory data structures (image grid).
-* It is accepted that Python will not be suitable for all processing (for example gridding), consequently the memory and compute overheads must be measured when allowing access to Python controlled memory in C++. 
+- To determine the suitability of Python as the language of the domain layer that controls:
+  - Data access and iteration (visibility data).
+  - Management of in-memory data structures (image grid).
+- It is accepted that Python will not be suitable for all processing (for example gridding), consequently the memory and compute overheads must be measured when allowing access to Python controlled memory in C++. 
 
 # Results
 https://docs.google.com/presentation/d/1T7TmovYOi1zO8SUA2nR_Ce5aUiT7ENbK4KITfnbWm7M/edit?usp=sharing
