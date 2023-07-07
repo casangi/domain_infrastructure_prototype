@@ -37,7 +37,7 @@ Example of running valgrind:
 callgrind_annotate --auto=yes callgrind.out.<pid> > profile.txt 
 
 # -fPIC info:
-https://stackoverflow.com/questions/15861759/how-much-overhead-can-the-fpic-flag-add
-https://akkadia.org/drepper/dsohowto.pdf
-https://cseweb.ucsd.edu/~gbournou/CSE131/the_inside_story_on_shared_libraries_and_dynamic_loading.pdf
+- https://stackoverflow.com/questions/15861759/how-much-overhead-can-the-fpic-flag-add
+- https://akkadia.org/drepper/dsohowto.pdf
+- https://cseweb.ucsd.edu/~gbournou/CSE131/the_inside_story_on_shared_libraries_and_dynamic_loading.pdf
 
