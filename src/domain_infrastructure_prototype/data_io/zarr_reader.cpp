@@ -75,7 +75,6 @@ void open_no_dask_zarr(complex<double>** vis, double** weight,  double** uvw, do
     *vis_chunk_shape = new long[vis_meta["chunks"].size()];
     //cout << vis_meta["chunks"].size() << endl;
     
-    int s;
     for(int i=0; i < vis_meta["chunks"].size(); i++){
         long s = static_cast<long>(vis_meta["chunks"][i]);
         (*vis_chunk_shape)[i] = s;

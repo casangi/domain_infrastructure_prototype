@@ -7,7 +7,7 @@ from datetime import datetime
 import re
 import os
 
-def profile_code(name,profile_results_name,is_python,image_size_list,n_time_chunks_list,n_chan_chunks_list,sampling_interval,set_grid='false'):
+def profile_code(vis_data_folder,name,profile_results_name,is_python,image_size_list,n_time_chunks_list,n_chan_chunks_list,sampling_interval,set_grid='false'):
 
     if is_python:
         process_name = "python " + name
@@ -23,19 +23,19 @@ def profile_code(name,profile_results_name,is_python,image_size_list,n_time_chun
     for n_time_chunks in n_time_chunks_list:
         for n_chan_chunks in n_chan_chunks_list:
             for image_size in image_size_list:
-                os.system('sync; echo 3 > /proc/sys/vm/drop_caches')
+                #os.system('sync; echo 3 > /proc/sys/vm/drop_caches') root needed for this
                 
                 if is_python:
                     if name=="main_pybind11.py":
-                        print(' '.join(["python", name, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks),"--set_grid",set_grid]))
-                        sub_process = subprocess.Popen(["python", name, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks),"--set_grid",set_grid], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        print(' '.join(["python", name, "--vis_data_folder", vis_data_folder,"--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks),"--set_grid",set_grid]))
+                        sub_process = subprocess.Popen(["python", name,  "--vis_data_folder", vis_data_folder, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks),"--set_grid",set_grid], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     else:
-                        print(' '.join(["python", name, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks)]))
-                        sub_process = subprocess.Popen(["python", name, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        print(' '.join(["python", name,  "--vis_data_folder", vis_data_folder, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks)]))
+                        sub_process = subprocess.Popen(["python", name,  "--vis_data_folder", vis_data_folder, "--image_size", str(image_size),"--n_time_chunks",str(n_time_chunks),"--n_chan_chunks",str(n_chan_chunks)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 else:
                 #./bin/cpp_gridder 500 1 2
-                    print(' '.join(["./bin/"+name, " ", str(image_size)," ",str(n_time_chunks)," ",str(n_chan_chunks)]))
-                    sub_process = subprocess.Popen(["./bin/"+name,str(image_size),str(n_time_chunks),str(n_chan_chunks)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    print(' '.join(["./bin/"+name," ",vis_data_folder," ", str(image_size)," ",str(n_time_chunks)," ",str(n_chan_chunks)]))
+                    sub_process = subprocess.Popen(["./bin/"+name, vis_data_folder, str(image_size),str(n_time_chunks),str(n_chan_chunks)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     
                 pgrep_command = f"pgrep -f '{process_name}'"
                 pid = subprocess.getoutput(pgrep_command)
@@ -97,6 +97,8 @@ def profile_code(name,profile_results_name,is_python,image_size_list,n_time_chun
 
 if __name__ == "__main__":
 
+    vis_data_folder = '/mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr'
+
     '''
     #Memory benchmarking
     image_size = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000]
@@ -104,11 +106,11 @@ if __name__ == "__main__":
     n_time_chunks_list = [10]
     type = "mem"
 
-    profile_code(name="cpp_gridder",profile_results_name="linux_cpp_" + type,is_python=False,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
-    profile_code(name="main_numba.py",profile_results_name="linux_numba_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
-    profile_code(name="main_pybind11.py",profile_results_name="linux_pybind11_cpp_grid_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='false')
-    profile_code(name="main_pybind11.py",profile_results_name="linux_pybind11_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='true')
-    profile_code(name="main_pybind11_cpp_only.py",profile_results_name="linux_pybind11_cpp_only_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
+    profile_code(vis_data_folder,name="cpp_gridder",profile_results_name="linux_cpp_" + type,is_python=False,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
+    profile_code(vis_data_folder,name="main_numba.py",profile_results_name="linux_numba_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
+    profile_code(vis_data_folder,name="main_pybind11.py",profile_results_name="linux_pybind11_cpp_grid_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='false')
+    profile_code(vis_data_folder,name="main_pybind11.py",profile_results_name="linux_pybind11_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='true')
+    profile_code(vis_data_folder,name="main_pybind11_cpp_only.py",profile_results_name="linux_pybind11_cpp_only_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
     '''
 
     '''
@@ -118,11 +120,11 @@ if __name__ == "__main__":
     n_time_chunks_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     type = "compute"
 
-    profile_code(name="cpp_gridder",profile_results_name="linux_cpp_" + type,is_python=False,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
-    profile_code(name="main_numba.py",profile_results_name="linux_numba_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
-    profile_code(name="main_pybind11.py",profile_results_name="linux_pybind11_cpp_grid_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='false')
-    profile_code(name="main_pybind11.py",profile_results_name="linux_pybind11_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='true')
-    profile_code(name="main_pybind11_cpp_only.py",profile_results_name="linux_pybind11_cpp_only_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
+    profile_code(vis_data_folder,name="cpp_gridder",profile_results_name="linux_cpp_" + type,is_python=False,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
+    profile_code(vis_data_folder,name="main_numba.py",profile_results_name="linux_numba_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
+    profile_code(vis_data_folder,name="main_pybind11.py",profile_results_name="linux_pybind11_cpp_grid_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='false')
+    profile_code(vis_data_folder,name="main_pybind11.py",profile_results_name="linux_pybind11_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='true')
+    profile_code(vis_data_folder,name="main_pybind11_cpp_only.py",profile_results_name="linux_pybind11_cpp_only_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
     '''
 
     image_size = [500]
@@ -130,9 +132,9 @@ if __name__ == "__main__":
     n_time_chunks_list = [1]
     type = "small_test"
 
-    profile_code(name="cpp_gridder",profile_results_name="linux_cpp_" + type,is_python=False,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
-    profile_code(name="main_numba.py",profile_results_name="linux_numba_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
-    profile_code(name="main_pybind11.py",profile_results_name="linux_pybind11_cpp_grid_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='false')
-    profile_code(name="main_pybind11.py",profile_results_name="linux_pybind11_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='true')
-    profile_code(name="main_pybind11_cpp_only.py",profile_results_name="linux_pybind11_cpp_only_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
+    profile_code(vis_data_folder,name="cpp_gridder",profile_results_name="linux_cpp_" + type,is_python=False,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
+    profile_code(vis_data_folder,name="main_numba.py",profile_results_name="linux_numba_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
+    profile_code(vis_data_folder,name="main_pybind11.py",profile_results_name="linux_pybind11_cpp_grid_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='false')
+    profile_code(vis_data_folder,name="main_pybind11.py",profile_results_name="linux_pybind11_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1,set_grid='true')
+    profile_code(vis_data_folder,name="main_pybind11_cpp_only.py",profile_results_name="linux_pybind11_cpp_only_"+ type,is_python=True,image_size_list=image_size,n_time_chunks_list=n_time_chunks_list,n_chan_chunks_list=n_chan_chunks_list,sampling_interval=0.1)
 

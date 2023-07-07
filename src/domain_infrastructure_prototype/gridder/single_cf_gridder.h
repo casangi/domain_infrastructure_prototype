@@ -25,7 +25,7 @@ public:
   std::vector<double> create_prolate_spheroidal_kernel_1d(int oversampling, int support);
   std::pair<std::vector<double>, std::vector<double>> prolate_spheroidal_function(std::vector<double> u);
     
-  std::pair<int, int> grid(string vis_data_folder, int image_size, int n_time_chunks, int n_chan_chunks);
+  std::pair<int, int> grid(std::string vis_data_folder, int image_size, int n_time_chunks, int n_chan_chunks);
 
 private:
     std::vector<std::complex<double>> internal_grid;

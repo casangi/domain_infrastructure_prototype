@@ -1,7 +1,13 @@
+# Objectives 
+## To determine the suitability of Python as the language of the domain layer that controls:
+### Data access and iteration (visibility data).
+### Management of in-memory data structures (image grid).
+## It is accepted that Python will not be suitable for all processing (for example gridding), consequently the memory and compute overheads must be measured when allowing access to Python controlled memory in C++. 
 
+# Results
+https://docs.google.com/presentation/d/1T7TmovYOi1zO8SUA2nR_Ce5aUiT7ENbK4KITfnbWm7M/edit?usp=sharing
 
-Create a conda python enviroment using dip_env.yml. '/mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr'
-
+# Create a conda python enviroment using dip_env.yml.
 
 # Compiling shared library on Linux in domain_infrastructure_prototype/src/domain_infrastructure_prototype
 
@@ -15,11 +21,11 @@ g++ -O3 -std=c++17  -I/mnt/condor/jsteeb/dip/dip_3_11/include main.cpp gridder/s
 
 # Examples of running the code
 
-./bin/cpp_gridder  1000   3   1
-python main_pybind11_cpp_only.py --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1
-python main_pybind11.py --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid true
-python main_pybind11.py --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid false
-python main_numba.py --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1
+./bin/cpp_gridder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr 1000   3   1
+python main_pybind11_cpp_only.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1
+python main_pybind11.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid true
+python main_pybind11.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid false
+python main_numba.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1
 
 # Valgrind
 To use valgrind add -g compiler flag.

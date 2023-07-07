@@ -63,7 +63,7 @@ public:
         std::cout << "**grid_time " << grid_time << std::endl;
     }
 
-    std::pair<int, int> grid(string vis_data_folder, int image_size, int n_time_chunks, int n_chan_chunks) {
+    std::pair<int, int> grid(std::string vis_data_folder, int image_size, int n_time_chunks, int n_chan_chunks) {
         py::gil_scoped_release gil_release;
 
         return single_cf_gridder::grid(vis_data_folder,image_size, n_time_chunks, n_chan_chunks);

@@ -116,7 +116,7 @@ void single_cf_gridder::add_to_grid(long* grid_shape, double* sum_weight, std::c
 }
 
 
-std::pair<int, int> single_cf_gridder::grid(string vis_data_folder, int image_size, int n_time_chunks, int n_chan_chunks)
+std::pair<int, int> single_cf_gridder::grid(std::string vis_data_folder, int image_size, int n_time_chunks, int n_chan_chunks)
 {
     
     double field_of_view = 60*M_PI/(180*3600);
@@ -224,7 +224,6 @@ std::pair<int, int> single_cf_gridder::grid(string vis_data_folder, int image_si
 
 std::vector<double> single_cf_gridder::create_prolate_spheroidal_kernel_1d(int oversampling, int support) {
     int support_center = support / 2;
-    int oversampling_center = oversampling / 2;
 
     std::vector<double> u(oversampling * (support_center), 0.0);
     for (int i = 0; i < oversampling * (support_center); i++) {

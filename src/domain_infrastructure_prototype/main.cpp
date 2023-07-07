@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    string vis_data_folder = std::stoi(argv[1]);
+    std::string vis_data_folder = argv[1];
     int image_size = std::stoi(argv[2]);
     int n_time_chunks = std::stoi(argv[3]);
     int n_chan_chunks = std::stoi(argv[4]);
