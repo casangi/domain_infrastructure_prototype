@@ -2,6 +2,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 #include <nlohmann/json.hpp>
+#include <string>
 
 #define FORCE_IMPORT_ARRAY
 namespace py = pybind11;
@@ -62,10 +63,10 @@ public:
         std::cout << "**grid_time " << grid_time << std::endl;
     }
 
-    std::pair<int, int> grid(int image_size, int n_time_chunks, int n_chan_chunks) {
+    std::pair<int, int> grid(string vis_data_folder, int image_size, int n_time_chunks, int n_chan_chunks) {
         py::gil_scoped_release gil_release;
 
-        return single_cf_gridder::grid(image_size, n_time_chunks, n_chan_chunks);
+        return single_cf_gridder::grid(vis_data_folder,image_size, n_time_chunks, n_chan_chunks);
     }
 };
 
@@ -79,6 +80,6 @@ PYBIND11_MODULE(pybind11_wrapper, m) {
              py::arg().noconvert(), py::arg().noconvert(), py::arg().noconvert(), py::arg().noconvert(),
              py::arg().noconvert(), py::arg().noconvert(), py::arg().noconvert(), py::arg().noconvert(),
              py::arg().noconvert(), py::arg().noconvert(), py::arg().noconvert())
-        .def("grid", &single_cf_gridder_pybind::grid, py::arg().noconvert(), py::arg().noconvert(),
+        .def("grid", &single_cf_gridder_pybind::grid, py::arg().noconvert(), py::arg().noconvert(), py::arg().noconvert(),
              py::arg().noconvert());
 }

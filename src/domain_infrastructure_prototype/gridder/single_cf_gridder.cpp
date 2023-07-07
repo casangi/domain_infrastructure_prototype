@@ -37,17 +37,6 @@ void single_cf_gridder::add_to_grid(long* grid_shape, double* sum_weight, std::c
     }else{
         grid = grid_ptr;
     }
-    
-//    cout << "1. **********************" << endl;
-//    cout << "grid_shape " << grid_shape[0] << ",*," << grid_shape[1] << ",*," << grid_shape[2] << ",*," << grid_shape[3] << endl;
-//    cout << "vis_shape " << vis_shape[0] << ",*," << vis_shape[1] << ",*," << vis_shape[2] << ",*," << vis_shape[3] << endl;
-//    cout << "vis_shape " << chan_map[0] << ",*," << freq_chan[0] << ",*," << chan_map[1] << ",*," << freq_chan[1] << endl;
-//    cout << " cgk_1D" << cgk_1D[0] << ",*," << cgk_1D[1] << ",*," << cgk_1D[2] << ",*," << cgk_1D[100] << ",*," << endl;
-//    cout << "delta_lm" << delta_lm[0] << ",*," << delta_lm[1] << endl;
-//
-//
-//    cout << "2. **********************" << endl;
-        
 
     int n_time = vis_shape[0];
     int n_baseline = vis_shape[1];
@@ -127,7 +116,7 @@ void single_cf_gridder::add_to_grid(long* grid_shape, double* sum_weight, std::c
 }
 
 
-std::pair<int, int> single_cf_gridder::grid(int image_size, int n_time_chunks, int n_chan_chunks)
+std::pair<int, int> single_cf_gridder::grid(string vis_data_folder, int image_size, int n_time_chunks, int n_chan_chunks)
 {
     
     double field_of_view = 60*M_PI/(180*3600);
@@ -147,27 +136,12 @@ std::pair<int, int> single_cf_gridder::grid(int image_size, int n_time_chunks, i
     double* uvw;
     double* chan;
     long* vis_shape;
-    
-//    int grid_size = n_imag_chan*n_imag_pol*image_size*image_size;
-//    std::vector<std::complex<double>> grid;
-//    grid.resize(grid_size, std::complex<double>(0.0, 0.0));
-//    vector<long> grid_shape = {n_imag_chan, n_imag_pol, image_size, image_size};
-//    std::complex<double>* grid_ptr = grid.data();
-//
-//    std::vector<double> sum_weight;
-//    sum_weight.resize(n_imag_chan*n_imag_pol, 0.0);
-//    double* sum_weight_ptr = sum_weight.data();
-    
+
     int chan_chunk_size = 2;
     int grid_size = chan_chunk_size*n_chan_chunks*n_imag_pol*image_size*image_size;
     cout << "grid_size " << grid_size << ",*," << chan_chunk_size << ",*," << n_chan_chunks << ",*," << n_imag_pol << ",*," << image_size <<  endl;
     //std::vector<std::complex<double>> grid(grid_size,std::complex<double>(0.0, 0.0));
     create_grid(chan_chunk_size*n_chan_chunks, n_imag_pol, image_size);
-    
-    
-    //std::vector<std::complex<double>> grid;
-    //grid.resize(grid_size, std::complex<double>(0.0, 0.0));
-    
     
     vector<long> grid_shape = {chan_chunk_size*n_chan_chunks, n_imag_pol, image_size, image_size};
     //std::complex<double>* grid_ptr = grid.data();
@@ -176,23 +150,6 @@ std::pair<int, int> single_cf_gridder::grid(int image_size, int n_time_chunks, i
     //sum_weight.resize(chan_chunk_size*n_chan_chunks*n_imag_pol, 0.0);
     std::vector<double> sum_weight(chan_chunk_size*n_chan_chunks*n_imag_pol, 0.0);
     double* sum_weight_ptr = sum_weight.data();
-    
-//    cout  << "****************" << endl;
-//    for (int i_chan = 0; i_chan < chan_chunk_size*n_chan_chunks; ++i_chan) {
-//        for (int i_pol = 0; i_pol < n_imag_pol; ++i_pol){
-//            cout << "sum_weight " << i_chan*n_imag_pol + i_pol << ",*," << sum_weight[i_chan*n_imag_pol + i_pol] << endl;
-//        }
-//    }
-//    cout  << "****************" << endl;
-    
-    
-    //size_t memory_reserved = sizeof(std::complex<double>) * grid.size();
-    //std::cout << "Memory reserved: " << memory_reserved/(1024.0*1024.0*1024.0) << " GiB" << std::endl;
-
-
-
-
-
 
     std::chrono::high_resolution_clock::time_point start;
     std::chrono::high_resolution_clock::time_point end;
@@ -209,12 +166,8 @@ std::pair<int, int> single_cf_gridder::grid(int image_size, int n_time_chunks, i
        for (int i_chan_chunk = 0; i_chan_chunk < n_chan_chunks; ++i_chan_chunk)
        {
            start = chrono::high_resolution_clock::now();
-           //open_no_dask_zarr(&vis,&weight,&uvw,&chan,&vis_shape,"/Users/jsteeb/Library/CloudStorage/Dropbox/performance_eval/data/ngvla_sim.vis.zarr", i_time_chunk, i_chan_chunk);
-           open_no_dask_zarr(&vis,&weight,&uvw,&chan,&vis_shape,"/mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr", i_time_chunk, i_chan_chunk);
+           open_no_dask_zarr(&vis,&weight,&uvw,&chan,&vis_shape,vis_data_folder, i_time_chunk, i_chan_chunk);
            
-           //memory_reserved = sizeof(std::complex<double>) * vis_shape[0]* vis_shape[1]* vis_shape[2]* vis_shape[3];
-           //std::cout << "Memory reserved: " << memory_reserved/(1024.0*1024.0*1024.0) << " GiB" << std::endl;
-
            chan_slice.resize(vis_shape[2]);
            chan_map.resize(vis_shape[2]);
            pol_map.resize(vis_shape[3]);
@@ -251,7 +204,6 @@ std::pair<int, int> single_cf_gridder::grid(int image_size, int n_time_chunks, i
            delete[] vis_shape;
        }
     }
-   // std::complex<double>* grid = grid_ptr;
     
 //    cout << "the grid is " << grid[12502500] << ",*," << grid[37502500] << ",*," << grid[262502500] << ",*," << grid[287502500] << ",*," << grid[512502500] << ",*," << grid[537502500] << ",*," << grid[962502500] << ",*," << grid[987502500] << endl;
 //
@@ -268,17 +220,6 @@ std::pair<int, int> single_cf_gridder::grid(int image_size, int n_time_chunks, i
     
     return std::make_pair(data_load_time, gridding_time);
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 std::vector<double> single_cf_gridder::create_prolate_spheroidal_kernel_1d(int oversampling, int support) {
@@ -367,135 +308,3 @@ std::pair<std::vector<double>, std::vector<double>> single_cf_gridder::prolate_s
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-//std::vector<std::vector<double>> single_cf_gridder::prolate_spheroidal_function(std::vector<double> u) {
-//    std::vector<std::vector<double>> grdsf(u.size(), std::vector<double>(2, 0.0));
-//
-//    std::vector<std::vector<double>> p = {{8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1},
-//                                           {4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2}};
-//    std::vector<std::vector<double>> q = {{1.0000000e0, 8.212018e-1, 2.078043e-1}, {1.0000000e0, 9.599102e-1, 2.918724e-1}};
-//
-//    int n_p = p[0].size();
-//    int n_q = q[0].size();
-//
-//    int size = u.size();
-//    std::vector<double> uend(size, 0.0);
-//    std::vector<int> part(size, 0);
-//
-//    for (int i = 0; i < size; i++) {
-//        if (u[i] >= 0.0 && u[i] < 0.75) {
-//            part[i] = 0;
-//            uend[i] = 0.75;
-//        } else if (u[i] >= 0.75 && u[i] < 1.0) {
-//            part[i] = 1;
-//            uend[i] = 1.0;
-//        }
-//    }
-//
-//
-//
-//    for (int i = 0; i < size; i++) {
-//        double v = 0.0;
-//        for (int j = 0; j < n_p; j++) {
-//            v += p[part[i]][j] * std::pow(u[i]*u[i] - uend[i]*uend[i], n_p - 1 - j);
-//        }
-//        grdsf[i][0] = v;
-//    }
-//
-//    for (int i = 0; i < size; i++) {
-//        double v = 1.0;
-//        for (int j = 0; j < n_q; j++) {
-//            v += q[part[i]][j] * std::pow(u[i]*u[i] - uend[i]*uend[i], n_q - 1 - j);
-//        }
-//        grdsf[i][1] = v;
-//    }
-//
-//    return grdsf;
-//}
-
-
-
-
-
-
-
-//void single_cf_gridder::standard_grid(std::complex<double>**** grid, int* grid_shape, double** sum_weight, std::complex<double>**** vis_data, int* vis_shape, double*** uvw, double* freq_chan, int* chan_map, int* pol_map, double**** weight, double* cgk_1D, float* delta_lm, double support, double oversampling) {
-//    int n_time = vis_shape[0];
-//    int n_baseline = vis_shape[1];
-//    int n_chan = vis_shape[2];
-//    int n_pol = vis_shape[3];
-//
-//    int n_u = grid_shape[2];
-//    int n_v = grid_shape[3];
-//    double c = 299792458.0;
-//
-//    int support_center = support / 2;
-//    int u_center = n_u / 2;
-//    int v_center = n_v / 2;
-//
-//    int start_support = -support_center;
-//    int end_support = support - support_center;
-//
-//    for (int i_time = 0; i_time < n_time; i_time++) {
-//        for (int i_baseline = 0; i_baseline < n_baseline; i_baseline++) {
-//            for (int i_chan = 0; i_chan < n_chan; i_chan++) {
-//                int a_chan = chan_map[i_chan];
-//                double u = uvw[i_time][i_baseline][0] * (-(freq_chan[i_chan] * delta_lm[0] * n_u) / c);
-//                double v = uvw[i_time][i_baseline][1] * (-(freq_chan[i_chan] * delta_lm[1] * n_v) / c);
-//
-//                if (!std::isnan(u) && !std::isnan(v)) {
-//                    double u_pos = u + u_center;
-//                    double v_pos = v + v_center;
-//
-//                    int u_center_indx = static_cast<int>(u_pos + 0.5);
-//                    int v_center_indx = static_cast<int>(v_pos + 0.5);
-//
-//                    if (u_center_indx + support_center < n_u && v_center_indx + support_center < n_v && u_center_indx - support_center >= 0 && v_center_indx - support_center >= 0) {
-//                        double u_offset = u_center_indx - u_pos;
-//                        int u_center_offset_indx = static_cast<int>(std::floor(u_offset * oversampling + 0.5));
-//                        double v_offset = v_center_indx - v_pos;
-//                        int v_center_offset_indx = static_cast<int>(std::floor(v_offset * oversampling + 0.5));
-//
-//                        for (int i_pol = 0; i_pol < n_pol; i_pol++) {
-//                            double sel_weight = weight[i_time][i_baseline][i_chan][i_pol];
-//                            std::complex<double> weighted_data = vis_data[i_time][i_baseline][i_chan][i_pol] * weight[i_time][i_baseline][i_chan][i_pol];
-//
-//                            if (!std::isnan(weighted_data.real()) && !std::isnan(weighted_data.imag()) && weighted_data.real() != 0.0 && weighted_data.imag() != 0.0) {
-//                                int a_pol = pol_map[i_pol];
-//                                double norm = 0.0;
-//
-//                                for (int i_v = start_support; i_v < end_support; i_v++) {
-//                                    int v_indx = v_center_indx + i_v;
-//                                    int v_offset_indx = std::abs(static_cast<int>(oversampling * i_v + v_center_offset_indx));
-//                                    double conv_v = cgk_1D[v_offset_indx];
-//
-//                                    for (int i_u = start_support; i_u < end_support; i_u++) {
-//                                        int u_indx = u_center_indx + i_u;
-//                                        int u_offset_indx = std::abs(static_cast<int>(oversampling * i_u + u_center_offset_indx));
-//                                        double conv_u = cgk_1D[u_offset_indx];
-//                                        double conv = conv_u * conv_v;
-//
-//                                        grid[a_chan][a_pol][u_indx][v_indx] += conv * weighted_data;
-//                                        norm += conv;
-//                                    }
-//                                }
-//
-//                                sum_weight[a_chan][a_pol] += sel_weight * norm;
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
