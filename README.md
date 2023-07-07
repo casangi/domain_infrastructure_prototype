@@ -7,7 +7,7 @@
 # Results
 https://docs.google.com/presentation/d/1T7TmovYOi1zO8SUA2nR_Ce5aUiT7ENbK4KITfnbWm7M/edit?usp=sharing
 
-# Create a conda python enviroment using dip_env.yml.
+# Create a conda python enviroment using dip_env.yml
 
 # Compiling shared library on Linux 
 
