@@ -14,26 +14,26 @@ https://docs.google.com/presentation/d/1T7TmovYOi1zO8SUA2nR_Ce5aUiT7ENbK4KITfnbW
 - Go to ```domain_infrastructure_prototype/src/domain_infrastructure_prototype```
 - ```g++ -O3  -fno-semantic-interposition -Wall -Wextra -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fpic /$(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp gridder/single_cf_gridder.cpp data_io/zarr_reader.cpp -o lib/pybind11_wrapper$(python3-config --extension-suffix) -lzstd```
 
-Remeber to change -I/mnt/condor/jsteeb/dip/dip_3_11/include
+Remeber to change ```-I/mnt/condor/jsteeb/dip/dip_3_11/include```
 
 # Compiling binary on Linux 
 
-- Go to domain_infrastructure_prototype/src/domain_infrastructure_prototype
-- g++ -O3 -std=c++17  -I/mnt/condor/jsteeb/dip/dip_3_11/include main.cpp gridder/single_cf_gridder.cpp data_io/zarr_reader.cpp -o bin/cpp_gridder -lzstd 
+- Go to ```domain_infrastructure_prototype/src/domain_infrastructure_prototype```
+- ```g++ -O3 -std=c++17  -I/mnt/condor/jsteeb/dip/dip_3_11/include main.cpp gridder/single_cf_gridder.cpp data_io/zarr_reader.cpp -o bin/cpp_gridder -lzstd``` 
 
 # Examples of running the code
 
-- python main_numba.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1
-- ./bin/cpp_gridder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr 1000   3   1
-- python main_pybind11_cpp_only.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1
-- python main_pybind11.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid true
-- python main_pybind11.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid false
+- ```python main_numba.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1```
+-``` python main_pybind11.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid true```
+- ```python main_pybind11.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid false```
+- ```python main_pybind11_cpp_only.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1```
+- ```./bin/cpp_gridder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr 1000   3   1```
   
 # Valgrind
 To use valgrind add -g compiler flag.
 
 Example of running valgrind:
-- valgrind --tool=callgrind --simulate-cache=yes python main_pybind11_cpp_only.py --image_size 5000 --n_time_chunks 1 --n_chan_chunks 3
+- ```valgrind --tool=callgrind --simulate-cache=yes python main_pybind11_cpp_only.py --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 5000 --n_time_chunks 1 --n_chan_chunks 3```
 callgrind_annotate --auto=yes callgrind.out.<pid> > profile.txt 
 
 # -fPIC info:
