@@ -11,8 +11,8 @@ https://docs.google.com/presentation/d/1T7TmovYOi1zO8SUA2nR_Ce5aUiT7ENbK4KITfnbW
 
 # Compiling shared library on Linux 
 
-- Go to domain_infrastructure_prototype/src/domain_infrastructure_prototype
-- g++ -O3  -fno-semantic-interposition -Wall -Wextra -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fpic /$(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp gridder/single_cf_gridder.cpp data_io/zarr_reader.cpp -o lib/pybind11_wrapper$(python3-config --extension-suffix) -lzstd
+- Go to ```domain_infrastructure_prototype/src/domain_infrastructure_prototype```
+- ```g++ -O3  -fno-semantic-interposition -Wall -Wextra -shared -std=c++17 -I/mnt/condor/jsteeb/dip/dip_3_11/include -fpic /$(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp gridder/single_cf_gridder.cpp data_io/zarr_reader.cpp -o lib/pybind11_wrapper$(python3-config --extension-suffix) -lzstd```
 
 Remeber to change -I/mnt/condor/jsteeb/dip/dip_3_11/include
 
