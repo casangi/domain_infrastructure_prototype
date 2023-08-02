@@ -24,7 +24,7 @@ Remeber to change ```-I/mnt/condor/jsteeb/dip/dip_3_11/include```
 # Examples of running the code
 
 - ```python main_numba.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1```
--``` python main_pybind11.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid true```
+- ``` python main_pybind11.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid true```
 - ```python main_pybind11.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1 --set_grid false```
 - ```python main_pybind11_cpp_only.py  --vis_data_folder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr --image_size 1000 --n_time_chunks 3 --n_chan_chunks 1```
 - ```./bin/cpp_gridder /mnt/condor/jsteeb/dip/ngvla_sim.vis.zarr 1000   3   1```
