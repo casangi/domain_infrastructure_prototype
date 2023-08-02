@@ -5,19 +5,33 @@ import time
 from gridder.single_cf_gridder_numba import _standard_grid_jit, _create_prolate_spheroidal_kernel, _create_prolate_spheroidal_kernel_1D
 from data_io.zarr_reader import _open_no_dask_zarr
 import matplotlib.pyplot as plt
+import xarray as xr
+import logging
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 def grid(vis_data_folder,n_time_chunks,n_chan_chunks,image_size):
+    
+    vis_ds_lazy = xr.open_zarr(vis_data_folder)
+    
+    logging.info("*"*40+"Dataset"+"*"*40)
+    logging.info(vis_ds_lazy)
+    logging.info("*"*80)
 
     field_of_view = 60*np.pi/(180*3600) #radians
-    n_imag_chan = 20
-    n_imag_pol = 2
+    n_imag_chan = vis_ds_lazy.dims['chan']
+    n_imag_pol = vis_ds_lazy.dims['pol']
     
-    time_chunk_size = 600
-    chan_chunk_size = 2
+    time_chunk_size = vis_ds_lazy.chunksizes['time'][0]
+    chan_chunk_size = vis_ds_lazy.chunksizes['chan'][0]
     
     data_load_time = 0
     gridding_time = 0
+    
     grid = np.full((n_chan_chunks*chan_chunk_size, n_imag_pol, image_size, image_size), np.complex128(0.0), dtype=np.complex128)
     
     grid_shape = np.array(grid.shape)
@@ -33,7 +47,7 @@ def grid(vis_data_folder,n_time_chunks,n_chan_chunks,image_size):
         for i_chan_chunk in range(n_chan_chunks):
             time_slice = slice(i_time_chunk*time_chunk_size,(i_time_chunk+1)*time_chunk_size)
             chan_slice = slice(i_chan_chunk*chan_chunk_size,(i_chan_chunk+1)*chan_chunk_size)
-            #print('Gridding chunk: ', time_slice, ',*,', chan_slice)
+            logging.info('Gridding chunk time slice: ' + str(time_slice) + ', chan slice,' + str(chan_slice))
             
             start = time.time()
             var_select = ['DATA','UVW','WEIGHT']
@@ -60,6 +74,8 @@ def grid(vis_data_folder,n_time_chunks,n_chan_chunks,image_size):
             del vis_ds
             
     #print('grid.shape',grid.shape,grid.dtype,grid.nbytes/(1024*1024*1024))
+    
+    logging.info("gridding_time " + str(gridding_time) + ", data_load_time " + str(data_load_time))
     return data_load_time, gridding_time
 
 
