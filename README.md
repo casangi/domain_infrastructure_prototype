@@ -6,6 +6,7 @@
 
 # Results
 Memo: https://www.dropbox.com/scl/fi/ppxzarl8rznh2gwrwsftt/DIP.pdf?rlkey=u4zadf4dcobccxkf68gfjd15f&dl=0
+
 Slides: https://docs.google.com/presentation/d/1T7TmovYOi1zO8SUA2nR_Ce5aUiT7ENbK4KITfnbWm7M/edit?usp=sharing
 
 # Create a conda python enviroment using dip_env.yml
