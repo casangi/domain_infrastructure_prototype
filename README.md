@@ -1,22 +1,24 @@
+**This prototype has been completed and the repository has been archived.**
+
 # Objectives 
 - To determine the suitability of Python as the language of the domain layer that controls:
   - Data access and iteration (visibility data).
   - Management of in-memory data structures (image grid).
-- It is accepted that Python will not be suitable for all processing (for example gridding), consequently the memory and compute overheads must be measured when allowing access to Python controlled memory in C++. 
+- It is accepted that Python will not be suitable for all processing (for example gridding), consequently, the memory and compute overheads must be measured when allowing access to Python-controlled memory in C++. 
 
 # Results
 Memo: https://www.dropbox.com/scl/fi/ppxzarl8rznh2gwrwsftt/DIP.pdf?rlkey=u4zadf4dcobccxkf68gfjd15f&dl=0
 
 Slides: https://docs.google.com/presentation/d/1T7TmovYOi1zO8SUA2nR_Ce5aUiT7ENbK4KITfnbWm7M/edit?usp=sharing
 
-# Create a conda python enviroment using dip_env.yml
+# Create a conda python environment using dip_env.yml
 
-# Compiling shared library on Linux 
+# Compiling the shared library on Linux 
 
 - Go to ```domain_infrastructure_prototype/src/domain_infrastructure_prototype```
 - ```g++ -O3  -fno-semantic-interposition -Wall -Wextra -shared -std=c++17 -I/Path/to/Python/Environment/include -fpic /$(python3 -m pybind11 --includes) gridder/pybind11_wrapper.cpp gridder/single_cf_gridder.cpp data_io/zarr_reader.cpp -o lib/pybind11_wrapper$(python3-config --extension-suffix) -lzstd```
 
-Remeber to change ```-I/Path/to/Python/Environment/include```
+Remember to change ```-I/Path/to/Python/Environment/include```
 
 # Compiling binary on Linux 
 
