@@ -7,7 +7,7 @@
 - It is accepted that Python will not be suitable for all processing (for example gridding), consequently, the memory and compute overheads must be measured when allowing access to Python-controlled memory in C++. 
 
 # Results
-Memo: https://www.dropbox.com/scl/fi/ppxzarl8rznh2gwrwsftt/DIP.pdf?rlkey=u4zadf4dcobccxkf68gfjd15f&dl=0
+Memo: https://www.overleaf.com/read/qbdwntqrbrsc#cde4b2
 
 Slides: https://docs.google.com/presentation/d/1T7TmovYOi1zO8SUA2nR_Ce5aUiT7ENbK4KITfnbWm7M/edit?usp=sharing
 
